@@ -1,7 +1,11 @@
 # Go Transmission
 Golang lib for Transmission API
 
-## Usage
+### Installation
+
+    $ go get github.com/tubbebubbe/transmission
+
+### Usage
 ```go
 package main
 
@@ -37,5 +41,5 @@ func main() {
 }
 ```
 
-###### Original author
+### Original author
 Long Nguyen (https://github.com/longnguyen11288/go-transmission)
