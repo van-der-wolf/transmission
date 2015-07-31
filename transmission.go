@@ -160,6 +160,14 @@ func (ac *TransmissionClient) ExecuteCommand(cmd *Command) (*Command, error) {
 	return out, nil
 }
 
+func (ac *TransmissionClient) ExecuteAddCommand(addCmd *Command) (TorrentAdded, error) {
+	outCmd, err := ac.ExecuteCommand(addCmd)
+	if err != nil {
+		return TorrentAdded{}, err
+	}
+	return outCmd.Arguments.TorrentAdded, nil
+}
+
 func encodeFile(file string) (string, error) {
 	fileData, err := ioutil.ReadFile(file)
 	if err != nil {

@@ -2,20 +2,21 @@ package transmission
 
 import (
 	"fmt"
-	"github.com/go-martini/martini"
-	"github.com/martini-contrib/auth"
-	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 var (
-	mux *http.ServeMux
+	cMux *http.ServeMux
 
 	client ApiClient
 
-	server *httptest.Server
+	cServer *httptest.Server
 )
 
 func RPCHandler(res http.ResponseWriter, req *http.Request) {
@@ -27,28 +28,28 @@ func RPCHandler(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, `{"arguments":{},"result":"no method name"}`)
 }
 
-func setup() {
+func cSetup() {
 	// test server
-	mux = http.NewServeMux()
+	cMux = http.NewServeMux()
 	m := martini.New()
 	r := martini.NewRouter()
 	r.Post("/transmission/rpc", RPCHandler)
 	m.Action(r.Handle)
 	m.Use(auth.Basic("test", "test"))
-	mux.Handle("/", m)
-	server = httptest.NewServer(mux)
+	cMux.Handle("/", m)
+	cServer = httptest.NewServer(cMux)
 
 	// github client configured to use test server
-	client = NewClient(server.URL, "test", "test")
+	client = NewClient(cServer.URL, "test", "test")
 }
 
-func teardown() {
-	server.Close()
+func cTeardown() {
+	cServer.Close()
 }
 
 func TestPost(t *testing.T) {
-	setup()
-	defer teardown()
+	cSetup()
+	defer cTeardown()
 	Convey("Test Post is working correctly", t, func() {
 		output, err := client.Post("")
 		So(err, ShouldBeNil)
@@ -56,7 +57,7 @@ func TestPost(t *testing.T) {
 	})
 
 	Convey("Test when auth is incorrect", t, func() {
-		fakeClient := NewClient(server.URL, "testfake", "testfake")
+		fakeClient := NewClient(cServer.URL, "testfake", "testfake")
 		output, err := fakeClient.Post("")
 		So(err, ShouldBeNil)
 		So(string(output), ShouldEqual, "Not Authorized\n")
