@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
+	"sort"
 )
 
 //TransmissionClient to talk to transmission
@@ -19,7 +20,7 @@ type Command struct {
 
 type arguments struct {
 	Fields       []string     `json:"fields,omitempty"`
-	Torrents     []Torrent    `json:"torrents,omitempty"`
+	Torrents     Torrents     `json:"torrents,omitempty"`
 	Ids          []int        `json:"ids,omitempty"`
 	DeleteData   bool         `json:"delete-local-data,omitempty"`
 	DownloadDir  string       `json:"download-dir,omitempty"`
@@ -33,6 +34,7 @@ type Torrent struct {
 	ID            int     `json:"id"`
 	Name          string  `json:"name"`
 	Status        int     `json:"status"`
+	AddedDate     int     `json:"addedDate"`
 	LeftUntilDone int     `json:"leftUntilDone"`
 	Eta           int     `json:"eta"`
 	UploadRatio   float64 `json:"uploadRatio"`
@@ -44,6 +46,53 @@ type Torrent struct {
 	SeedRatioMode int     `json:"seedRatioMode"`
 	Error         int     `json:"error"`
 	ErrorString   string  `json:"errorString"`
+}
+
+// Torrents represent []Torrent
+type Torrents []Torrent
+
+// sorting types
+type (
+	byID        Torrents
+	byName      Torrents
+	byAddedDate Torrents
+)
+
+func (t byID) Len() int           { return len(t) }
+func (t byID) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t byID) Less(i, j int) bool { return t[i].ID < t[j].ID }
+
+func (t byName) Len() int           { return len(t) }
+func (t byName) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t byName) Less(i, j int) bool { return t[i].Name < t[j].Name }
+
+func (t byAddedDate) Len() int           { return len(t) }
+func (t byAddedDate) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t byAddedDate) Less(i, j int) bool { return t[i].AddedDate < t[j].AddedDate }
+
+// methods of 'Torrents' to sort by ID, Name or AddedDate
+func (t Torrents) SortByID(reverse bool) {
+	if reverse {
+		sort.Sort(sort.Reverse(byID(t)))
+		return
+	}
+	sort.Sort(byID(t))
+}
+
+func (t Torrents) SortByName(reverse bool) {
+	if reverse {
+		sort.Sort(sort.Reverse(byName(t)))
+		return
+	}
+	sort.Sort(byName(t))
+}
+
+func (t Torrents) SortByAddedDate(reverse bool) {
+	if reverse {
+		sort.Sort(sort.Reverse(byAddedDate(t)))
+		return
+	}
+	sort.Sort(byAddedDate(t))
 }
 
 //TorrentAdded data returning
@@ -61,12 +110,12 @@ func New(url string, username string, password string) TransmissionClient {
 }
 
 //GetTorrents get a list of torrents
-func (ac *TransmissionClient) GetTorrents() ([]Torrent, error) {
+func (ac *TransmissionClient) GetTorrents() (Torrents, error) {
 	cmd, err := NewGetTorrentsCmd()
 
 	out, err := ac.ExecuteCommand(cmd)
 	if err != nil {
-		return []Torrent{}, err
+		return nil, err
 	}
 
 	return out.Arguments.Torrents, nil
@@ -87,7 +136,7 @@ func NewGetTorrentsCmd() (*Command, error) {
 
 	cmd.Method = "torrent-get"
 	cmd.Arguments.Fields = []string{"id", "name",
-		"status", "leftUntilDone", "eta", "uploadRatio",
+		"status", "addedDate", "leftUntilDone", "eta", "uploadRatio",
 		"rateDownload", "rateUpload", "downloadDir", "isFinished",
 		"percentDone", "seedRatioMode", "error", "errorString"}
 
