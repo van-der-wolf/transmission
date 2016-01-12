@@ -42,6 +42,8 @@ type Torrent struct {
 	IsFinished    bool    `json:"isFinished"`
 	PercentDone   float64 `json:"percentDone"`
 	SeedRatioMode int     `json:"seedRatioMode"`
+	Error         int     `json:"error"`
+	ErrorString   string  `json:"errorString"`
 }
 
 //TorrentAdded data returning
@@ -86,8 +88,8 @@ func NewGetTorrentsCmd() (*Command, error) {
 	cmd.Method = "torrent-get"
 	cmd.Arguments.Fields = []string{"id", "name",
 		"status", "leftUntilDone", "eta", "uploadRatio",
-		"rateDownload", "rateUpload", "downloadDir",
-		"isFinished", "percentDone", "seedRatioMode"}
+		"rateDownload", "rateUpload", "downloadDir", "isFinished",
+		"percentDone", "seedRatioMode", "error", "errorString"}
 
 	return cmd, nil
 }
