@@ -29,23 +29,33 @@ type arguments struct {
 	TorrentAdded TorrentAdded `json:"torrent-added"`
 }
 
+type tracker struct {
+	Announce string `json:"announce"`
+	Id       int    `json:"id"`
+	Scrape   string `json:"scrape"`
+	Tire     int    `json:"tire"`
+}
+
 //Torrent struct for torrents
 type Torrent struct {
-	ID            int     `json:"id"`
-	Name          string  `json:"name"`
-	Status        int     `json:"status"`
-	AddedDate     int     `json:"addedDate"`
-	LeftUntilDone int     `json:"leftUntilDone"`
-	Eta           int     `json:"eta"`
-	UploadRatio   float64 `json:"uploadRatio"`
-	RateDownload  int     `json:"rateDownload"`
-	RateUpload    int     `json:"rateUpload"`
-	DownloadDir   string  `json:"downloadDir"`
-	IsFinished    bool    `json:"isFinished"`
-	PercentDone   float64 `json:"percentDone"`
-	SeedRatioMode int     `json:"seedRatioMode"`
-	Error         int     `json:"error"`
-	ErrorString   string  `json:"errorString"`
+	ID             int       `json:"id"`
+	Name           string    `json:"name"`
+	Status         int       `json:"status"`
+	AddedDate      int       `json:"addedDate"`
+	LeftUntilDone  int       `json:"leftUntilDone"`
+	Eta            int       `json:"eta"`
+	UploadRatio    float64   `json:"uploadRatio"`
+	RateDownload   int       `json:"rateDownload"`
+	RateUpload     int       `json:"rateUpload"`
+	DownloadDir    string    `json:"downloadDir"`
+	DownloadedEver int       `json:"downloadedEver"`
+	UploadedEver   int       `json:"uploadedEver"`
+	IsFinished     bool      `json:"isFinished"`
+	PercentDone    float64   `json:"percentDone"`
+	SeedRatioMode  int       `json:"seedRatioMode"`
+	Trackers       []tracker `json:"trackers"`
+	Error          int       `json:"error"`
+	ErrorString    string    `json:"errorString"`
 }
 
 // Torrents represent []Torrent
@@ -136,9 +146,9 @@ func NewGetTorrentsCmd() (*Command, error) {
 
 	cmd.Method = "torrent-get"
 	cmd.Arguments.Fields = []string{"id", "name",
-		"status", "addedDate", "leftUntilDone", "eta", "uploadRatio",
-		"rateDownload", "rateUpload", "downloadDir", "isFinished",
-		"percentDone", "seedRatioMode", "error", "errorString"}
+		"status", "addedDate", "leftUntilDone", "eta", "uploadRatio", "uploadedEver",
+		"rateDownload", "rateUpload", "downloadDir", "isFinished", "downloadedEver",
+		"percentDone", "seedRatioMode", "error", "errorString", "trackers"}
 
 	return cmd, nil
 }
