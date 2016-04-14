@@ -34,6 +34,7 @@ func (ac *ApiClient) Post(body string) ([]byte, error) {
 	if err != nil {
 		return make([]byte, 0), err
 	}
+	defer res.Body.Close()
 	if res.StatusCode == 409 {
 		ac.getToken()
 		authRequest, err := ac.authRequest("POST", body)
@@ -63,6 +64,7 @@ func (ac *ApiClient) getToken() error {
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 	ac.token = res.Header.Get("X-Transmission-Session-Id")
 	return nil
 }
