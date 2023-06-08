@@ -40,6 +40,8 @@ type arguments struct {
 	MetaInfo     string       `json:"metainfo,omitempty"`
 	Filename     string       `json:"filename,omitempty"`
 	TorrentAdded TorrentAdded `json:"torrent-added"`
+	Location     string       `json:"location,omitempty"`
+	Move         bool         `json:"move,omitempty"`
 	// Stats
 	ActiveTorrentCount int             `json:"activeTorrentCount"`
 	CumulativeStats    cumulativeStats `json:"cumulative-stats"`
